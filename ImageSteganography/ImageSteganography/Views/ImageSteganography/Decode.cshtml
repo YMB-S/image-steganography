@@ -1,0 +1,44 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<div class="text-center" data-bs-theme="dark">
+    <h1 class="display-4">Image steganography</h1>
+    <div class="shadow-lg p-3 mb-5 bg-body-tertiary rounded">
+        <p>Upload an image to decode a message.</p>
+        <form id="inputForm" method="post" asp-controller="ImageSteganography" asp-action="DecodeMessageFromImage" enctype="multipart/form-data" target="_blank">
+            <input type="file" name="imageFile" id="imageFile" accept="image/png, image/jpeg" />
+            <br />
+            <div id="responseContainer"><label>Decoded message:</label></div>
+            <br />
+            <div>
+                <button type="button" id="submitButton" class="btn btn-dark">Decode message</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<script>
+    document.getElementById("submitButton").addEventListener("click", async (event) => {
+
+        const form = document.getElementById('inputForm');
+        const formData = new FormData(form);
+
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            document.getElementById("responseContainer").innerText = response.text();
+            alert(response.text());
+        } else {
+            window.location.href = "/Home/Error/";
+        }
+
+    });
+</script>

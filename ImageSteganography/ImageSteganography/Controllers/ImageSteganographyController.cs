@@ -8,7 +8,12 @@ namespace ImageSteganography.Controllers
     {
         private readonly ImageSteganographyService service = service;
 
-        public IActionResult Index()
+        public IActionResult Encode()
+        {
+            return View();
+        }
+
+        public IActionResult Decode()
         {
             return View();
         }
@@ -23,6 +28,22 @@ namespace ImageSteganography.Controllers
                 var file = File(stream.FileStream, "image/png");
 
                 return file;
+            }
+            catch (InvalidOperationException e)
+            {
+                return StatusCode(500);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DecodeMessageFromImage([FromForm] DecodeMessageFromImageModel model)
+        {
+            try
+            {
+                var message = await service.DecodeMessageFromImage(model.ImageFile);
+                Console.WriteLine(message);
+
+                return Ok(message);
             }
             catch (InvalidOperationException e)
             {

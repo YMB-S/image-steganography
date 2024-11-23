@@ -12,20 +12,34 @@ namespace ImageSteganography.Services
     {
         private readonly List<string> allowedFileTypes = config.GetSection("AllowedFileTypes").Get<List<string>>() ?? throw new InvalidOperationException();
 
-        public bool IsAllowedFileType(string filetype)
+        #region Common methods
+        private bool IsAllowedFileType(string filetype)
         {
             return allowedFileTypes.Contains(filetype);
         }
-
-        public async Task<FileStreamResult> EncodeMessageInImage(IFormFile imageFile, string message)
+        private int GetLastDigitOf(int number)
         {
-            if (imageFile == null)
+            return number % 10;
+        }
+
+        private async Task<Image<Rgba32>> LoadImageFrom(IFormFile imageFile)
+        {
+            if (imageFile == null || !IsAllowedFileType(Path.GetExtension(imageFile.FileName)))
             {
                 throw new InvalidOperationException();
             }
 
             var stream = imageFile.OpenReadStream();
             var image = await Image.LoadAsync<Rgba32>(stream);
+            return image;
+        }
+        #endregion
+
+        #region Methods used for encoding
+
+        public async Task<FileStreamResult> EncodeMessageInImage(IFormFile imageFile, string message)
+        {
+            var image = await LoadImageFrom(imageFile);
 
             if (
                 !IsAllowedFileType(Path.GetExtension(imageFile.FileName)) ||
@@ -39,7 +53,7 @@ namespace ImageSteganography.Services
             
             var embeddableMessage = GetEmbeddableValuesForMessage(message);
             var manipulatedImage = Encode(image, embeddableMessage);
-            var fileStream = await SaveImage(manipulatedImage);
+            var fileStream = await GetFileStreamFor(manipulatedImage);
             return fileStream;
         }
 
@@ -117,11 +131,6 @@ namespace ImageSteganography.Services
             return (byte)newValue;
         }
 
-        private int GetLastDigitOf(int number)
-        {
-            return number % 10;
-        }
-
         private string[] SplitUnicodeString(string toSplit)
         {
             StringInfo stringInfo = new(toSplit);
@@ -133,7 +142,7 @@ namespace ImageSteganography.Services
             return result;
         }
 
-        private async Task<FileStreamResult> SaveImage(Image<Rgba32> image)
+        private async Task<FileStreamResult> GetFileStreamFor(Image<Rgba32> image)
         {
             var outputStream = new MemoryStream();
             await image.SaveAsPngAsync(outputStream);
@@ -160,25 +169,39 @@ namespace ImageSteganography.Services
             return embeddable;
         }
 
-        private Image<Rgba32> ReverseImageColors(Image<Rgba32> image)
+        #endregion
+
+        #region Methods used for decoding
+
+        public async Task<string> DecodeMessageFromImage(IFormFile imageFile)
         {
+            var image = await LoadImageFrom(imageFile);
+
             for (int y = 0; y < image.Height; y++)
             {
-                for (int x = 0; x < image.Width; x++)
+                for (int x = 0; x < image.Width; x += 2)
                 {
-                    // Get the pixel color
-                    Rgba32 pixel = image[x, y];
+                    Rgba32 firstPixel = image[x, y];
+                    Rgba32 secondPixel = image[x + 1, y];
 
-                    // Example manipulation: invert colors
-                    pixel.R = (byte)(255 - pixel.R);
-                    pixel.G = (byte)(255 - pixel.G);
-                    pixel.B = (byte)(255 - pixel.B);
+                    int[] values = new int[]
+                    { 
+                        GetLastDigitOf(firstPixel.R), GetLastDigitOf(firstPixel.G), GetLastDigitOf(firstPixel.B),
+                        GetLastDigitOf(secondPixel.R), GetLastDigitOf(secondPixel.G), GetLastDigitOf(secondPixel.B),
+                    };
 
-                    // Write the pixel back to the image
-                    image[x, y] = pixel;
+                    foreach (var item in values)
+                    {
+                        Console.WriteLine(item);
+                    }
+
+                    return "";
                 }
             }
-            return image;
+
+            return "";
         }
+
+        #endregion
     }
 }

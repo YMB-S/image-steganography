@@ -1,53 +1,6 @@
-﻿@{
-    ViewData["Title"] = "Image Steganography";
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
 }
-
-<div class="text-center" data-bs-theme="dark">
-    <h1 class="display-4">Image steganography</h1>
-    <div class="shadow-lg p-3 mb-5 bg-body-tertiary rounded">
-        <p>Type some text and select an image.</p>
-        <form id="inputForm" method="post" asp-controller="ImageSteganography" asp-action="EncodeMessageInImage" enctype="multipart/form-data" target="_blank">
-            <label>Message:</label>
-            <input type="text" name="message" id="message" />
-            <input type="file" name="imageFile" id="imageFile" accept="image/png, image/jpeg" />
-            <br />
-            <br />
-            <div>
-                <button type="button" id="submitButton" class="btn btn-dark">Embed message</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script>
-    document.getElementById('submitButton').addEventListener('click', async (event) => {
-
-        const messageInput = document.getElementById('message').value;
-        const imageInput = document.getElementById('imageFile').files.length;
-
-        if (!messageInput || imageInput === 0) {
-            event.preventDefault();
-            window.location.href = '/Home/Error';
-        }
-
-        const form = document.getElementById('inputForm');
-        const formData = new FormData(form);
-
-        const response = await fetch(form.action, {
-            method: 'POST',
-            body: formData,
-        });
-
-        if (response.ok) {
-            const blob = await response.blob();
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'manipulated-image.png';
-            link.click();
-            URL.revokeObjectURL(url);
-        } else {
-            window.location.href = "/Home/Error/";
-        }
-    });
-</script>
+<p>welcome</p>
