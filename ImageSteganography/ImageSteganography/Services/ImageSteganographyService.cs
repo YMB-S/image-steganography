@@ -39,6 +39,10 @@ namespace ImageSteganography.Services
             {
                 int[] embeddableValues = CharacterToEmbeddableIntegerArray(ch);
                 result.Add(embeddableValues);
+                foreach (var item in embeddableValues)
+                {
+                    Console.WriteLine(item);
+                }
             }
 
             return result;
@@ -54,12 +58,23 @@ namespace ImageSteganography.Services
             {
                 for (int x = 0; x < image.Width; x += 2)
                 {
+                    if (currentValueIndex >= maxValueIndex)
+                    {
+                        return image;
+                    }
+
+                    currentValue = values[currentValueIndex];
                     Rgba32 firstPixel = image[x, y];
                     Rgba32 secondPixel = image[x + 1, y];
 
+                    // The Unicode characters we encode have up to 6 digits so we use 2 pixels to encode each of the 6 digits
                     firstPixel.R = EncodeDigitInByte(firstPixel.R, currentValue[0]);
                     firstPixel.G = EncodeDigitInByte(firstPixel.G, currentValue[1]);
                     firstPixel.B = EncodeDigitInByte(firstPixel.B, currentValue[2]);
+
+                    secondPixel.R = EncodeDigitInByte(secondPixel.R, currentValue[3]);
+                    secondPixel.G = EncodeDigitInByte(secondPixel.G, currentValue[4]);
+                    secondPixel.B = EncodeDigitInByte(secondPixel.B, currentValue[5]);
 
                     //Console.WriteLine(firstPixel.R);
                     //Console.WriteLine(firstPixel.G);
@@ -68,12 +83,7 @@ namespace ImageSteganography.Services
                     image[x, y] = firstPixel;
                     image[x+1, y] = secondPixel;
 
-                    return image;
-                    //Rgba32 pixel = image[x, y];
-                    //pixel.R = (byte)(255 - pixel.R);
-                    //pixel.G = (byte)(255 - pixel.G);
-                    //pixel.B = (byte)(255 - pixel.B);
-                    //image[x, y] = pixel;
+                    currentValueIndex++;
                 }
             }
             return image;
@@ -88,8 +98,6 @@ namespace ImageSteganography.Services
             {
                 newValue -= 10;
             }
-
-            Console.WriteLine(newValue);
 
             return (byte)newValue;
         }
@@ -123,19 +131,15 @@ namespace ImageSteganography.Services
 
         private int[] CharacterToEmbeddableIntegerArray(string character)
         {
-            //if (character.Length != 1) { throw new ArgumentException($"Only one character at a time can be processed: {character}"); }
-
             int integerValue = character.EnumerateRunes().First().Value;
             string[] num = integerValue.ToString().Select(c => c.ToString()).ToArray();
 
             int[] embeddable = { 0, 0, 0, 0, 0, 0 };
 
-            var end = num[0];
-
             for (int i = 0; i < num.Length; i++)
             {
                 string digit = num[num.Length-i-1].ToString();
-                embeddable[num.Length - i - 1] = Int32.Parse(digit);
+                embeddable[embeddable.Length - i - 1] = Int32.Parse(digit);
             }
 
             return embeddable;
