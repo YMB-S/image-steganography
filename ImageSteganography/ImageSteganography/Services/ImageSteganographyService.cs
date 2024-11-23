@@ -1,12 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO.Pipelines;
-using System.Text;
+using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
-//using static System.Net.Mime.MediaTypeNames;
 
 namespace ImageSteganography.Services
 {
@@ -21,13 +19,34 @@ namespace ImageSteganography.Services
 
         public async Task<FileStreamResult> EncodeMessageInImage(IFormFile imageFile, string message)
         {
+            if (imageFile == null)
+            {
+                throw new InvalidOperationException();
+            }
+
             var stream = imageFile.OpenReadStream();
             var image = await Image.LoadAsync<Rgba32>(stream);
 
+            if (
+                !IsAllowedFileType(Path.GetExtension(imageFile.FileName)) ||
+                message == null ||
+                message.Equals(string.Empty) ||
+                !MessageFitsInImage(image, message)
+            )
+            {
+                throw new InvalidOperationException();
+            }
+            
             var embeddableMessage = GetEmbeddableValuesForMessage(message);
             var manipulatedImage = Encode(image, embeddableMessage);
             var fileStream = await SaveImage(manipulatedImage);
             return fileStream;
+        }
+
+        private bool MessageFitsInImage(Image<Rgba32> image, string message)
+        {
+            int amountOfPixels = image.Width * image.Height;
+            return (amountOfPixels / 2) >= message.Length;
         }
 
         private List<int[]> GetEmbeddableValuesForMessage(string message)

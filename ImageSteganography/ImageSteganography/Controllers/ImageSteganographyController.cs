@@ -16,20 +16,20 @@ namespace ImageSteganography.Controllers
         [HttpPost]
         public async Task<IActionResult> EncodeMessageInImage([FromForm] EncodeMessageInImageModel model)
         {
-            if (model.ImageFile == null)
+            try
             {
-                return Redirect("/Home/Error");
-            }
+                FileStreamResult stream = await service.EncodeMessageInImage(model.ImageFile, model.Message);
+                stream.FileStream.Position = 0;
+                var file = File(stream.FileStream, "image/png");
 
-            if (!service.IsAllowedFileType(Path.GetExtension(model.ImageFile.FileName)))
+                return file;
+            }
+            catch (InvalidOperationException e)
             {
-                return Redirect("/Home/Error");
+                //Response.Headers["Location"] = "/Home/Error";
+                //return Redirect("/Home/Error");
+                return StatusCode(500);
             }
-
-            var stream = await service.EncodeMessageInImage(model.ImageFile, model.Message);
-            var file = File(stream.FileStream, "image/png");
-
-            return file;
         }
     }
 }
