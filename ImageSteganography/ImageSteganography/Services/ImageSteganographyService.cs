@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO.Pipelines;
 using System.Reflection;
@@ -50,11 +51,30 @@ namespace ImageSteganography.Services
             {
                 throw new InvalidOperationException();
             }
-            
+
+            var embeddableMessageLength = GetSizeOfMessageAsEmbeddableValue(message.Length);
             var embeddableMessage = GetEmbeddableValuesForMessage(message);
+
+            embeddableMessage.Insert(0, embeddableMessageLength); // The length of the message is encoded in the first 2 pixels
+
             var manipulatedImage = Encode(image, embeddableMessage);
             var fileStream = await GetFileStreamFor(manipulatedImage);
             return fileStream;
+        }
+
+        private int[] GetSizeOfMessageAsEmbeddableValue(int sizeOfMessage)
+        {
+            var num = sizeOfMessage.ToString().Select(c => c.ToString()).ToArray();
+
+            int[] embeddableLengthOfMessage = { 0, 0, 0, 0, 0, 0 };
+
+            for (int i = 0; i < num.Length; i++)
+            {
+                string digit = num[num.Length - i - 1].ToString();
+                embeddableLengthOfMessage[embeddableLengthOfMessage.Length - i - 1] = Int32.Parse(digit);
+            }
+
+            return embeddableLengthOfMessage;
         }
 
         private bool MessageFitsInImage(Image<Rgba32> image, string message)
