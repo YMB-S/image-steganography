@@ -95,10 +95,6 @@ namespace ImageSteganography.Services
                     secondPixel.G = EncodeDigitInByte(secondPixel.G, currentValue[4]);
                     secondPixel.B = EncodeDigitInByte(secondPixel.B, currentValue[5]);
 
-                    //Console.WriteLine(firstPixel.R);
-                    //Console.WriteLine(firstPixel.G);
-                    //Console.WriteLine(firstPixel.B);
-
                     image[x, y] = firstPixel;
                     image[x+1, y] = secondPixel;
 

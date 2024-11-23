@@ -26,8 +26,6 @@ namespace ImageSteganography.Controllers
             }
             catch (InvalidOperationException e)
             {
-                //Response.Headers["Location"] = "/Home/Error";
-                //return Redirect("/Home/Error");
                 return StatusCode(500);
             }
         }
