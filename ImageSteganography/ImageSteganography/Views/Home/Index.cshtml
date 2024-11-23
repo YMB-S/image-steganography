@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Image Steganography";
+}
+
+<div class="text-center" data-bs-theme="dark">
+    <h1 class="display-4">Image steganography</h1>
+    <div class="shadow-lg p-3 mb-5 bg-body-tertiary rounded">
+        <p>Type some text and select an image.</p>
+        <form id="inputForm" method="post" asp-controller="ImageSteganography" asp-action="EncodeMessageInImage" enctype="multipart/form-data" target="_blank">
+            <label>Message:</label>
+            <input type="text" name="message"/>
+            <input type="file" name="imageFile" accept="image/png, image/jpeg" />
+            <br />
+            <br />
+            <div>
+                <input class="btn btn-dark" type="submit" value="Embed message" />
+            </div>
+        </form>
+    </div>
+</div>
