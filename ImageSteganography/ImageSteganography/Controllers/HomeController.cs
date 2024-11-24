@@ -1,6 +1,6 @@
-using System.Diagnostics;
 using ImageSteganography.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace ImageSteganography.Controllers
 {

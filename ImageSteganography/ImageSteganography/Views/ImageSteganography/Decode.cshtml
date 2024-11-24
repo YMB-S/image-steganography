@@ -1,11 +1,10 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Decode";
 }
 
 <div class="text-center" data-bs-theme="dark">
-    <h1 class="display-4">Image steganography</h1>
+    <h1 class="display-4">Image steganography - Encode</h1>
+    <hr />
     <div class="shadow-lg p-3 mb-5 bg-body-tertiary rounded">
         <p>Upload an image to decode a message.</p>
         <form id="inputForm" method="post" asp-controller="ImageSteganography" asp-action="DecodeMessageFromImage" enctype="multipart/form-data" target="_blank">
@@ -17,7 +16,7 @@
             </div>
             <br />
             <br />
-            <div class="shadow-lg p-3 mb-5 bg-body-tertiary rounded" id="responseContainer"><label>Decoded message:</label></div>
+            <div class="shadow-lg p-3 mb-5 bg-light-subtle rounded" id="responseContainer"><label>Decoded message:</label></div>
         </form>
     </div>
 </div>
@@ -38,6 +37,8 @@
         if (response.ok) {
             const decodedMessage = await response.text();
             document.getElementById("responseContainer").innerText = "Decoded message: " + decodedMessage;
+            document.getElementById("responseContainer").classList = "shadow-lg p-3 mb-5 bg-success rounded";
+
         } else {
             window.location.href = "/Home/Error/";
         }

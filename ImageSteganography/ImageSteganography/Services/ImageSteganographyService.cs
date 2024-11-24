@@ -1,11 +1,7 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.IO.Pipelines;
-using System.Reflection;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using System.Globalization;
 
 namespace ImageSteganography.Services
 {
@@ -141,7 +137,7 @@ namespace ImageSteganography.Services
                     secondPixel.B = EncodeDigitInByte(secondPixel.B, currentValue[5]);
 
                     image[x, y] = firstPixel;
-                    image[x+1, y] = secondPixel;
+                    image[x + 1, y] = secondPixel;
 
                     currentValueIndex++;
                 }
@@ -154,7 +150,7 @@ namespace ImageSteganography.Services
             int roundedToLastDecimal = input - GetLastDigitOf(input);
             int newValue = roundedToLastDecimal + digit;
 
-            if(newValue > 255)
+            if (newValue > 255)
             {
                 newValue -= 10;
             }
@@ -193,7 +189,7 @@ namespace ImageSteganography.Services
 
             for (int i = 0; i < num.Length; i++)
             {
-                string digit = num[num.Length-i-1].ToString();
+                string digit = num[num.Length - i - 1].ToString();
                 embeddable[embeddable.Length - i - 1] = Int32.Parse(digit);
             }
 
@@ -218,7 +214,7 @@ namespace ImageSteganography.Services
                 for (int x = 0; x < image.Width; x += 2)
                 {
                     // We don't want to decode the message length as if it were part of the message itself
-                    if (CurrentlyProcessingMessageLength(pixelPairsSkipped)) 
+                    if (CurrentlyProcessingMessageLength(pixelPairsSkipped))
                     {
                         pixelPairsSkipped++;
                         continue;

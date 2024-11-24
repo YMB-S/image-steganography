@@ -1,6 +1,13 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Home";
 }
-<p>welcome</p>
+
+<div class="text-center" data-bs-theme="dark">
+    <h1 class="display-4">Image steganography</h1>
+    <hr />
+    <div class="shadow-lg p-3 mb-5 bg-body-tertiary rounded">
+        <p>Hide messages in images.</p>
+        <button type="button" onclick="location.href='/ImageSteganography/Encode';" class="btn btn-dark">Encode</button>
+        <button type="button" onclick="location.href='/ImageSteganography/Decode';" class="btn btn-dark">Decode</button>
+    </div>
+</div>
