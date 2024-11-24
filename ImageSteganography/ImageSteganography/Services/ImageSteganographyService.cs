@@ -107,10 +107,6 @@ namespace ImageSteganography.Services
             {
                 int[] embeddableValues = CharacterToEmbeddableIntegerArray(ch);
                 result.Add(embeddableValues);
-                foreach (var item in embeddableValues)
-                {
-                    Console.WriteLine(item);
-                }
             }
 
             return result;
@@ -237,7 +233,6 @@ namespace ImageSteganography.Services
                     string decodedCharacter = char.ConvertFromUtf32(Int32.Parse(firstMessageSection + secondMessageSection)).ToString();
                     decodedMessage += decodedCharacter;
                     amountOfCharactersDecoded++;
-                    Console.WriteLine(decodedCharacter);
 
                     if (amountOfCharactersDecoded >= amountOfCharactersInMessage)
                     {
