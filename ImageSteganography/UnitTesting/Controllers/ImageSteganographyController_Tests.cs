@@ -53,39 +53,45 @@ namespace UnitTesting.Controllers
 
             using (var resultImage = Image.Load<Rgba32>(responseBytes))
             {
-                // Assert correct size of message is encoded in the first pixel
+                // Assert correct size of message is encoded in the first four pixels
                 Assert.Equal(0, resultImage[0, 0].R);
                 Assert.Equal(0, resultImage[0, 0].G);
                 Assert.Equal(0, resultImage[0, 0].B);
                 Assert.Equal(0, resultImage[1, 0].R);
                 Assert.Equal(0, resultImage[1, 0].G);
-                Assert.Equal(3, resultImage[1, 0].B);
+                Assert.Equal(0, resultImage[1, 0].B);
 
-                // Assert message is encoded correctly
-
-                // Assert A is encoded by int 97
                 Assert.Equal(0, resultImage[2, 0].R);
                 Assert.Equal(0, resultImage[2, 0].G);
                 Assert.Equal(0, resultImage[2, 0].B);
                 Assert.Equal(0, resultImage[3, 0].R);
-                Assert.Equal(9, resultImage[3, 0].G);
-                Assert.Equal(7, resultImage[3, 0].B);
+                Assert.Equal(0, resultImage[3, 0].G);
+                Assert.Equal(3, resultImage[3, 0].B);
 
-                // Assert B is encoded by int 98
+                // Assert message is encoded correctly
+                // Assert A is encoded by int 97
                 Assert.Equal(0, resultImage[4, 0].R);
                 Assert.Equal(0, resultImage[4, 0].G);
                 Assert.Equal(0, resultImage[4, 0].B);
                 Assert.Equal(0, resultImage[5, 0].R);
                 Assert.Equal(9, resultImage[5, 0].G);
-                Assert.Equal(8, resultImage[5, 0].B);
+                Assert.Equal(7, resultImage[5, 0].B);
+
+                // Assert B is encoded by int 98
+                Assert.Equal(0, resultImage[6, 0].R);
+                Assert.Equal(0, resultImage[6, 0].G);
+                Assert.Equal(0, resultImage[6, 0].B);
+                Assert.Equal(0, resultImage[7, 0].R);
+                Assert.Equal(9, resultImage[7, 0].G);
+                Assert.Equal(8, resultImage[7, 0].B);
 
                 // Assert 🍌 is encoded by int 127820
-                Assert.Equal(1, resultImage[6, 0].R);
-                Assert.Equal(2, resultImage[6, 0].G);
-                Assert.Equal(7, resultImage[6, 0].B);
-                Assert.Equal(8, resultImage[7, 0].R);
-                Assert.Equal(2, resultImage[7, 0].G);
-                Assert.Equal(0, resultImage[7, 0].B);
+                Assert.Equal(1, resultImage[8, 0].R);
+                Assert.Equal(2, resultImage[8, 0].G);
+                Assert.Equal(7, resultImage[8, 0].B);
+                Assert.Equal(8, resultImage[9, 0].R);
+                Assert.Equal(2, resultImage[9, 0].G);
+                Assert.Equal(0, resultImage[9, 0].B);
             }
 		}
 

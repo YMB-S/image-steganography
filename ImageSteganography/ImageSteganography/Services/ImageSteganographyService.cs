@@ -52,25 +52,40 @@ namespace ImageSteganography.Services
                 throw new InvalidOperationException();
             }
 
-            var embeddableMessageLength = GetSizeOfMessageAsEmbeddableValue(SplitUnicodeString(message).Length);
+            var embeddableMessageLength = GetLengthOfMessageAsEmbeddableValue(SplitUnicodeString(message).Length);
             var embeddableMessage = GetEmbeddableValuesForMessage(message);
 
-            embeddableMessage.Insert(0, embeddableMessageLength); // The length of the message is encoded in the first 2 pixels
+            AddLengthOfMessageToEmbeddableMessage(embeddableMessage, embeddableMessageLength);
 
             var manipulatedImage = Encode(image, embeddableMessage);
             var fileStream = await GetFileStreamFor(manipulatedImage);
             return fileStream;
         }
 
-        private int[] GetSizeOfMessageAsEmbeddableValue(int sizeOfMessage)
+        private void AddLengthOfMessageToEmbeddableMessage(List<int[]> embeddableMessage, int[] embeddableMessageLength)
         {
-            var num = sizeOfMessage.ToString().Select(c => c.ToString()).ToArray();
+            int[] firstPixelData = new int[6];
+            Array.Copy(embeddableMessageLength, 0, firstPixelData, 0, 6);
 
-            int[] embeddableLengthOfMessage = { 0, 0, 0, 0, 0, 0 };
+            int[] secondPixelData = new int[6];
+            Array.Copy(embeddableMessageLength, 6, secondPixelData, 0, 6);
 
-            for (int i = 0; i < num.Length; i++)
+            embeddableMessage.Insert(0, firstPixelData); // The length of the message is encoded in the first four pixels
+            embeddableMessage.Insert(1, secondPixelData);
+        }
+
+        private int[] GetLengthOfMessageAsEmbeddableValue(long sizeOfMessage)
+        {
+            string[] digits = sizeOfMessage.ToString().Select(c => c.ToString()).ToArray();
+
+            // We use two pixels to store the message length. This gives us a maximum message length of (10^12) -1.
+            // Fun fact: that's over 320.000 bibles.
+            // Encoding that would require an image file of roughly 2TB. As such, two pixels should be enough space.
+            int[] embeddableLengthOfMessage = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+            for (int i = 0; i < digits.Length; i++)
             {
-                string digit = num[num.Length - i - 1].ToString();
+                string digit = digits[digits.Length - i - 1].ToString();
                 embeddableLengthOfMessage[embeddableLengthOfMessage.Length - i - 1] = Int32.Parse(digit);
             }
 
