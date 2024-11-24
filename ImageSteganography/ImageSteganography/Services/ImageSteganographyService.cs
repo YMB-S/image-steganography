@@ -23,7 +23,7 @@ namespace ImageSteganography.Services
             return number % 10;
         }
 
-        private async Task<Image<Rgba32>> LoadImageFrom(IFormFile imageFile)
+        public async Task<Image<Rgba32>> LoadImageFrom(IFormFile imageFile)
         {
             if (imageFile == null || !IsAllowedFileType(Path.GetExtension(imageFile.FileName)))
             {
@@ -52,7 +52,7 @@ namespace ImageSteganography.Services
                 throw new InvalidOperationException();
             }
 
-            var embeddableMessageLength = GetSizeOfMessageAsEmbeddableValue(message.Length);
+            var embeddableMessageLength = GetSizeOfMessageAsEmbeddableValue(SplitUnicodeString(message).Length);
             var embeddableMessage = GetEmbeddableValuesForMessage(message);
 
             embeddableMessage.Insert(0, embeddableMessageLength); // The length of the message is encoded in the first 2 pixels
