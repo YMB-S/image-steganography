@@ -2,3 +2,5 @@
 ImageSteganography/ImageSteganography/bin
 ImageSteganography/ImageSteganography/obj
 .vs
+ImageSteganography/UnitTesting/obj
+ImageSteganography/UnitTesting/bin
