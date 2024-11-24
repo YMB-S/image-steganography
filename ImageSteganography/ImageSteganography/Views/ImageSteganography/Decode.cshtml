@@ -11,11 +11,13 @@
         <form id="inputForm" method="post" asp-controller="ImageSteganography" asp-action="DecodeMessageFromImage" enctype="multipart/form-data" target="_blank">
             <input type="file" name="imageFile" id="imageFile" accept="image/png, image/jpeg" />
             <br />
-            <div id="responseContainer"><label>Decoded message:</label></div>
             <br />
             <div>
                 <button type="button" id="submitButton" class="btn btn-dark">Decode message</button>
             </div>
+            <br />
+            <br />
+            <div class="shadow-lg p-3 mb-5 bg-body-tertiary rounded" id="responseContainer"><label>Decoded message:</label></div>
         </form>
     </div>
 </div>
@@ -34,8 +36,8 @@
         });
 
         if (response.ok) {
-            document.getElementById("responseContainer").innerText = response.text();
-            alert(response.text());
+            const decodedMessage = await response.text();
+            document.getElementById("responseContainer").innerText = "Decoded message: " + decodedMessage;
         } else {
             window.location.href = "/Home/Error/";
         }

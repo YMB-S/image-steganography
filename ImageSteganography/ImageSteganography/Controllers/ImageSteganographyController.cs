@@ -41,7 +41,6 @@ namespace ImageSteganography.Controllers
             try
             {
                 var message = await service.DecodeMessageFromImage(model.ImageFile);
-                Console.WriteLine(message);
 
                 return Ok(message);
             }

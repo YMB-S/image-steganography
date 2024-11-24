@@ -212,29 +212,68 @@ namespace ImageSteganography.Services
         {
             var image = await LoadImageFrom(imageFile);
 
+            long amountOfCharactersInMessage = GetMessageLengthFromImage(image);
+            long amountOfCharactersDecoded = 0;
+            string decodedMessage = "";
+
+            int pixelPairsSkipped = 0;
             for (int y = 0; y < image.Height; y++)
             {
                 for (int x = 0; x < image.Width; x += 2)
                 {
+                    // We don't want to decode the message length as if it were part of the message itself
+                    if (CurrentlyProcessingMessageLength(pixelPairsSkipped)) 
+                    {
+                        pixelPairsSkipped++;
+                        continue;
+                    }
+
                     Rgba32 firstPixel = image[x, y];
                     Rgba32 secondPixel = image[x + 1, y];
 
-                    int[] values = new int[]
-                    { 
-                        GetLastDigitOf(firstPixel.R), GetLastDigitOf(firstPixel.G), GetLastDigitOf(firstPixel.B),
-                        GetLastDigitOf(secondPixel.R), GetLastDigitOf(secondPixel.G), GetLastDigitOf(secondPixel.B),
-                    };
+                    string firstMessageSection = GetLastDigitOf(firstPixel.R).ToString() + GetLastDigitOf(firstPixel.G).ToString() + GetLastDigitOf(firstPixel.B).ToString();
+                    string secondMessageSection = GetLastDigitOf(secondPixel.R).ToString() + GetLastDigitOf(secondPixel.G).ToString() + GetLastDigitOf(secondPixel.B).ToString();
 
-                    foreach (var item in values)
+                    string decodedCharacter = char.ConvertFromUtf32(Int32.Parse(firstMessageSection + secondMessageSection)).ToString();
+                    decodedMessage += decodedCharacter;
+                    amountOfCharactersDecoded++;
+                    Console.WriteLine(decodedCharacter);
+
+                    if (amountOfCharactersDecoded >= amountOfCharactersInMessage)
                     {
-                        Console.WriteLine(item);
+                        return decodedMessage;
                     }
-
-                    return "";
                 }
             }
 
-            return "";
+            return decodedMessage;
+        }
+
+        private long GetMessageLengthFromImage(Image<Rgba32> image)
+        {
+            var firstPixel = image[0, 0];
+            var secondPixel = image[1, 0];
+            var thirdPixel = image[2, 0];
+            var fourthPixel = image[3, 0];
+
+            string firstLengthSection = GetLastDigitOf(firstPixel.R).ToString() + GetLastDigitOf(firstPixel.G).ToString() + GetLastDigitOf(firstPixel.B).ToString();
+            string secondLengthSection = GetLastDigitOf(secondPixel.R).ToString() + GetLastDigitOf(secondPixel.G).ToString() + GetLastDigitOf(secondPixel.B).ToString();
+            string thirdLengthSection = GetLastDigitOf(thirdPixel.R).ToString() + GetLastDigitOf(thirdPixel.G).ToString() + GetLastDigitOf(thirdPixel.B).ToString();
+            string fourthLengthSection = GetLastDigitOf(fourthPixel.R).ToString() + GetLastDigitOf(fourthPixel.G).ToString() + GetLastDigitOf(fourthPixel.B).ToString();
+
+            string messageLengthAsString = (
+                firstLengthSection +
+                secondLengthSection +
+                thirdLengthSection +
+                fourthLengthSection
+            );
+
+            return long.Parse(messageLengthAsString);
+        }
+
+        private bool CurrentlyProcessingMessageLength(long numberOfPixelPairsProcessed)
+        {
+            return (numberOfPixelPairsProcessed <= 1); // The first four pixels contain the message length. Because we skip two pairs, the first four pixels will not be part of the decoded message.
         }
 
         #endregion
