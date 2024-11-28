@@ -29,6 +29,7 @@ namespace UnitTesting.Controllers
 				.Build();
 
 			var service = new Mock<ImageSteganographyService>(configuration).Object;
+
 			var controller = new ImageSteganographyController(service);
 
 			string testMessage = "ab🍌";

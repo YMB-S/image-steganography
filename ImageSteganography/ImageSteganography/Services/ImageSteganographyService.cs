@@ -110,20 +110,20 @@ namespace ImageSteganography.Services
 
         private Image<Rgba32> Encode(Image<Rgba32> image, List<int[]> values)
         {
-            int currentValueIndex = 0;
-            int maxValueIndex = values.Count;
-            int[] currentValue = values[currentValueIndex];
+            int amountOfCharactersEncoded = 0;
+            int amountOfCharactersToEncode = values.Count;
+            int[] currentValue = values[0];
 
             for (int y = 0; y < image.Height; y++)
             {
                 for (int x = 0; x < image.Width; x += 2)
                 {
-                    if (currentValueIndex >= maxValueIndex)
+                    if (amountOfCharactersEncoded >= amountOfCharactersToEncode)
                     {
                         return image;
                     }
 
-                    currentValue = values[currentValueIndex];
+                    currentValue = values[amountOfCharactersEncoded];
                     Rgba32 firstPixel = image[x, y];
                     Rgba32 secondPixel = image[x + 1, y];
 
@@ -139,7 +139,7 @@ namespace ImageSteganography.Services
                     image[x, y] = firstPixel;
                     image[x + 1, y] = secondPixel;
 
-                    currentValueIndex++;
+                    amountOfCharactersEncoded++;
                 }
             }
             return image;
@@ -226,7 +226,15 @@ namespace ImageSteganography.Services
                     string firstMessageSection = GetLastDigitOf(firstPixel.R).ToString() + GetLastDigitOf(firstPixel.G).ToString() + GetLastDigitOf(firstPixel.B).ToString();
                     string secondMessageSection = GetLastDigitOf(secondPixel.R).ToString() + GetLastDigitOf(secondPixel.G).ToString() + GetLastDigitOf(secondPixel.B).ToString();
 
-                    string decodedCharacter = char.ConvertFromUtf32(Int32.Parse(firstMessageSection + secondMessageSection)).ToString();
+                    int decodedUnicodeCharacterDecimalValue = Int32.Parse(firstMessageSection + secondMessageSection);
+                    int unknownUnicodeCharacterDecimalValue = 65533;
+
+                    if (IsInvalidUnicodeCharacterNumber(decodedUnicodeCharacterDecimalValue))
+                    {
+                        decodedUnicodeCharacterDecimalValue = unknownUnicodeCharacterDecimalValue;
+                    }
+
+                    string decodedCharacter = char.ConvertFromUtf32(decodedUnicodeCharacterDecimalValue).ToString();
                     decodedMessage += decodedCharacter;
                     amountOfCharactersDecoded++;
 
@@ -238,6 +246,14 @@ namespace ImageSteganography.Services
             }
 
             return decodedMessage;
+        }
+
+        private bool IsInvalidUnicodeCharacterNumber(int unicodeCharacterNumber)
+        {
+            int startOfDisallowedRange = 55296;
+            int endOfDisallowedRange = 57343;
+
+            return unicodeCharacterNumber >= startOfDisallowedRange && unicodeCharacterNumber <= endOfDisallowedRange;
         }
 
         private long GetMessageLengthFromImage(Image<Rgba32> image)
