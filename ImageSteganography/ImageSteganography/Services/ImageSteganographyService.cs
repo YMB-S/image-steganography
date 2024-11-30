@@ -187,6 +187,8 @@ namespace ImageSteganography.Services
 
             int[] embeddable = { 0, 0, 0, 0, 0, 0 };
 
+            //int size = 
+
             for (int i = 0; i < num.Length; i++)
             {
                 string digit = num[num.Length - i - 1].ToString();
